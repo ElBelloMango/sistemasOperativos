@@ -1,0 +1,12 @@
+Materia: Matematicas
+Nota: 1
+Creditos: 1
+Materia: Ciencias
+Nota: 2
+Creditos: 2
+Materia: Geografia
+Nota: 3
+Creditos: 3
+Materia: Fisica
+Nota: 4
+Creditos: 4

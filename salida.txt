@@ -1,0 +1,8 @@
+|#|   Materia|Nota|Creditos|
+|1|Matematica| 1.0|       1|
+|2|  Ciencias| 2.0|       2|
+|3| Geografia| 3.0|       3|
+|4|    Fisica| 4.0|       4|
+Promedio del semestre: 2.500000
+Total creditos: 10
+Promedio Ponderado: 3.000000
