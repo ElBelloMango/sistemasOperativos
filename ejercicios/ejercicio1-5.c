@@ -1,56 +1,48 @@
 #include <stdio.h>
-int suma(int ,int );
-int suma(int sumando1,int sumando2){
+float suma(float ,float );
+float suma(float sumando1,float sumando2){
     return sumando1+sumando2;
 }
 
-int resta(int ,int );
-int resta(int minuendo,int sustraendo){
+float resta(float ,float );
+float resta(float minuendo,float sustraendo){
     return minuendo-sustraendo;
 }
 
-int multiplicar(int ,int );
-int multiplicar(int multiplicando,int multiplicador){
+float multiplicar(float ,float );
+float multiplicar(float multiplicando,float multiplicador){
     return (multiplicando) * (multiplicador);
 }
-
 int main(void)
 {
-    int entrada;
+    char entrada="c";
     do
     {
-        printf("1 para sumar dos numeros\n2 para restar dos numeros\n3 para multiplicar dos numeros\n0 para salir\n");
-        scanf("%d",&entrada);
-        if (entrada==1)
+        float operando1;
+        float operando2;
+        printf("\nIngrese el operando 1\n");
+        scanf("%f",&operando1);
+        printf("\nIngrese el operando 2\n");
+        scanf("%f",&operando2);
+        printf("\nIngrese la operacion a realizar (+ - *)\n");
+        getc(stdin);
+        scanf("%c",&entrada);
+        switch (entrada)
         {
-            int sumando1;
-            int sumando2;
-            printf("Ingrese el primer sumando\n");
-            scanf("%d",&sumando1);
-            printf("Ingrese el segundo sumando\n");
-            scanf("%d",&sumando2);
-            printf("%d + %d = %d\n",sumando1,sumando2,suma(sumando1,sumando2));
+        case '+':
+            printf("%f + %f = %f",operando1,operando2,suma(operando1,operando2));
+            break;
+        case '-':
+            printf("%f - %f = %f",operando1,operando2,resta(operando1,operando2));
+            break;
+        case '*':
+            printf("%f * %f = %f",operando1,operando2,multiplicar(operando1,operando2));
+        default:
+            break;
         }
-        else if (entrada==2)
-        {
-            int minuendo;
-            int sustraendo;
-            printf("Ingrese el minuendo\n");
-            scanf("%d",&minuendo);
-            printf("Ingrese el sustraendo\n");
-            scanf("%d",&sustraendo);
-            printf("%d - %d = %d\n",minuendo,sustraendo,resta(minuendo,sustraendo));
-        }
-        else if (entrada==3)
-        {
-            int multiplicando;
-            int multiplicador;
-            printf("Ingrese el multiplicando\n");
-            scanf("%d",&multiplicando);
-            printf("Ingrese el multiplicador\n");
-            scanf("%d",&multiplicador);
-            printf("%d x %d = %d\n",multiplicando,multiplicador,multiplicar(multiplicando,multiplicador));
-        }      
-    } while (entrada!=0);
+        printf("\nq para salir\n");
+        getc(stdin);
+        scanf("%c",&entrada);   
+    } while (entrada!='q');
     return 0;
 }
