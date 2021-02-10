@@ -1,2 +1,5 @@
+Tamaño: 10
 |Nombre |Cedula |Semestre |
-Camilo 10001231 10
+Angel 11111111 1
+Berto 22222222 2
+Carvy 33333333 3
