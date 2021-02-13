@@ -1,0 +1,4 @@
+Tamaño: 20
+|Nombre |Cedula |Semestre |
+juancho 10294921 2
+pepe 20202112 2

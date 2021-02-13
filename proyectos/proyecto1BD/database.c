@@ -8,8 +8,18 @@ typedef struct estudiante
     char nombre[30];
     int semestre;
 };
-
+struct estudiante *mkdb(char *nombre, int size);
 void mkreg(struct estudiante *bd, int cedula, char *nombre, int semestre, int *nroRegistro);
+void savedb(FILE *archivo2, struct estudiante *espaciobd, char *nombre, int tamanobd, int contadorRegistro);
+struct estudiante *loaddb(FILE *archivo, struct estudiante *espaciobd, int *tamanobd, int *contadorRegistro, char *nombre);
+void readall(struct estudiante *bd, int tamanobd);
+void readsize(struct estudiante *bd, int tamanobd);
+void readreg(struct estudiante *bd, int tamanobd,int cedula);
+
+struct estudiante *mkdb(char *nombre, int size)
+{
+    return (struct estudiante *)malloc(sizeof(struct estudiante) * size);
+}
 void mkreg(struct estudiante *bd, int cedula, char *nombre, int semestre, int *nroRegistro)
 {
     strcpy((bd + *nroRegistro)->nombre, nombre);
@@ -17,12 +27,97 @@ void mkreg(struct estudiante *bd, int cedula, char *nombre, int semestre, int *n
     (bd + *nroRegistro)->semestre = semestre;
     (*nroRegistro)++;
 }
-struct estudiante* mkdb(char *nombre, int size);
-struct estudiante* mkdb(char *nombre, int size)
+void savedb(FILE *archivo2, struct estudiante *espaciobd, char *nombre, int tamanobd, int contadorRegistro)
 {
-    return (struct estudiante *)malloc(sizeof(struct estudiante) * size);
+    fprintf(archivo2, "Tamaño: %d\n", tamanobd);
+    fprintf(archivo2, "|Nombre |Cedula |Semestre |\n");
+    for (int i = 0; i < contadorRegistro; i++)
+    {
+        fprintf(archivo2, "%s %d %d\n", (espaciobd + i)->nombre, (espaciobd + i)->cedula, (espaciobd + i)->semestre);
+    }
 }
-
+struct estudiante *loaddb(FILE *archivo, struct estudiante *espaciobda, int *tamanobd, int *contadorRegistro, char *nombre)
+{
+    char LTrash[50];
+    char linea[50];
+    char lineaAnt[50];
+    char nombreEstudiante[30];
+    int contRegistros = 0;
+    int cedula;
+    int semestre;
+    fscanf(archivo, "%s", LTrash);       //Omitimos la primer palabra
+    fscanf(archivo, "%d", tamanobd);     //guardamos el tamaño de la BD
+    fgets(lineaAnt, "%s[^\n]", archivo); //Omitir primera linea.
+    fgets(lineaAnt, "%s[^\n]", archivo); //Omitir Segunda linea.
+    while (1)
+    {
+        fgets(linea, "%s[^\n]", archivo);
+        if (strncmp(lineaAnt, linea, 50) == 0)
+        {
+            break;
+        }
+        printf("%s\n", linea);
+        strcpy(lineaAnt, linea);
+        contRegistros++;
+    }
+    *contadorRegistro = contRegistros;
+    printf("%d\n", contRegistros);
+    espaciobda = mkdb(nombre, *tamanobd);
+    rewind(archivo);
+    fgets(lineaAnt, "%s[^\n]", archivo); //Omitir primera linea.
+    fgets(lineaAnt, "%s[^\n]", archivo); //Omitir Segunda linea.
+    for (int i = 0; i < contRegistros; i++)
+    {
+        fscanf(archivo, "%s", nombreEstudiante);
+        fscanf(archivo, "%d", &cedula);
+        fscanf(archivo, "%d", &semestre);
+        // mkreg(espaciobda, cedula, nombreEstudiante, semestre, &i); //Me jodía los otros ciclos por cambiar directamente el valor de i.
+        strcpy((espaciobda + i)->nombre, nombreEstudiante);
+        (espaciobda + i)->cedula = cedula;
+        (espaciobda + i)->semestre = semestre;
+    }
+    return espaciobda;
+}
+void readall(struct estudiante *bd, int tamanobd)
+{
+    for (int i = 0; i < tamanobd; i++)
+    {
+        printf("%s\n", (bd + i)->nombre);
+        printf("%d\n", (bd + i)->cedula);
+        printf("%d\n", (bd + i)->semestre);
+    }
+}
+void readsize(struct estudiante *bd, int tamanobd)
+{
+    for (int i = 0; i < tamanobd; i++)
+    {
+        if ((bd + i)->cedula==0)
+        {
+            printf("La base de datos tiene %d registros de %d disponibles\n",i,tamanobd);
+            break;
+        }
+    }
+}
+void readreg(struct estudiante *bd, int tamanobd,int cedula)
+{
+    int found=0;
+    for (int i = 0; i < tamanobd; i++)
+    {
+        if ((bd + i)->cedula==cedula)
+        {
+            printf("-------------Registro encontrado---------\n");
+            printf("%s\n", (bd + i)->nombre);
+            printf("%d\n", (bd + i)->cedula);
+            printf("%d\n", (bd + i)->semestre);
+            found = 1;
+            break;
+        }
+    }
+    if(found == 0)
+    {
+        printf("Registro no encontrado.\n");
+    }
+}
 int main(int argc, char const *argv[])
 {
     int contadorRegistro = 0;
@@ -32,13 +127,13 @@ int main(int argc, char const *argv[])
     do
     {
         printf("Ingrese un comando\n");
-        fscanf(stdin,"%s", comando);
+        fscanf(stdin, "%s", comando);
         getc(stdin);
-        if (strncmp("mkdb", comando,4) == 0)
+        if (strncmp("mkdb", comando, 4) == 0)
         {
             char nombre[20];
             fscanf(stdin, "%s", nombre);
-            fscanf(stdin, "%d", &tamanobd); 
+            fscanf(stdin, "%d", &tamanobd);
             // fgets("nan", "%s[^\n]", stdin); //Eliminar argumentos extras.
             espaciobd = mkdb(nombre, tamanobd);
         }
@@ -58,76 +153,58 @@ int main(int argc, char const *argv[])
             char nombre[20];
             fscanf(stdin, "%s", nombre);
             // fgets("nan", "%s[^\n]", stdin); //Eliminar argumentos extras.
-            FILE *archivo2=fopen(nombre,"w+");
-            fprintf(archivo2,"Tamaño: %d\n",tamanobd);
-            fprintf(archivo2,"|Nombre |Cedula |Semestre |\n");
-            for (int i = 0; i < contadorRegistro; i++)
-            {
-                fprintf(archivo2, "%s %d %d\n", (espaciobd + i)->nombre, (espaciobd + i)->cedula, (espaciobd + i)->semestre);
-            }
+            FILE *archivo2 = fopen(nombre, "w+");
+            savedb(archivo2, espaciobd, nombre, tamanobd, contadorRegistro);
         }
         else if (strncmp("loaddb", comando, 6) == 0)
         {
-            
+
             char nombre[20];
             fscanf(stdin, "%s", nombre);
-            // fgets("nan", "%s[^\n]", stdin); //Eliminar argumentos extras.
-            char LTrash[50];
-            char linea[50];
-            char lineaAnt[50];
-            char nombreEstudiante[30];
-            int contRegistros = 0;
-            int cedula;
-            int semestre;
-            FILE *archivo=fopen(nombre,"r");
-            fscanf(archivo,"%s",LTrash); //Omitimos la primer palabra
-            fscanf(archivo,"%d",&tamanobd); //guardamos el tamaño de la BD
-            fgets(lineaAnt, "%s[^\n]", archivo); //Omitir primera linea.
-            fgets(lineaAnt, "%s[^\n]", archivo); //Omitir Segunda linea.
-            while (1)
+            // fgets("nan", "%s[^\n]", stdin); //Eliminar argumentos extras. Descartada esta linea por bug con los fgets al declarar un archivo en modo lectura
+            FILE *archivo = fopen(nombre, "r");
+            if (archivo == NULL)
             {
-                fgets(linea, "%s[^\n]", archivo);
-                if (strncmp(lineaAnt, linea, 50)==0)
-                {
-                    break;
-                }
-                printf("%s\n",linea);
-                strcpy(lineaAnt,linea);
-                contRegistros++;
+                perror("Error: ");
+                return EXIT_FAILURE;
             }
-            contadorRegistro = contRegistros;
-            printf("%d\n",contRegistros);
-            espaciobd = mkdb(nombre, tamanobd);
-            rewind(archivo);
-            fgets(lineaAnt, "%s[^\n]", archivo); //Omitir primera linea.
-            fgets(lineaAnt, "%s[^\n]", archivo); //Omitir Segunda linea.
-            for (int i = 0; i < contRegistros;i++)
-            {
-                fscanf(archivo,"%s",nombreEstudiante);
-                fscanf(archivo,"%d",&cedula);
-                fscanf(archivo,"%d",&semestre);
-                // mkreg(espaciobd, cedula, nombreEstudiante, semestre, &i);
-                strcpy((espaciobd + i)->nombre, nombreEstudiante);
-                (espaciobd + i)->cedula = cedula;
-                (espaciobd + i)->semestre = semestre;
-            }
+            espaciobd = loaddb(archivo, espaciobd, &tamanobd, &contadorRegistro, nombre);
+            fclose(archivo);
         }
         else if (strncmp("readall", comando, 7) == 0)
         {
-            for (int i = 0; i < tamanobd; i++)
-            {
-                printf("%s\n", (espaciobd + i)->nombre);
-                printf("%d\n", (espaciobd + i)->cedula);
-                printf("%d\n", (espaciobd + i)->semestre);
-            }
+            readall(espaciobd,tamanobd);
         }
-
+        else if (strncmp("readsize", comando, 8) == 0)
+        {
+            readsize(espaciobd,tamanobd);
+        }
+        else if (strncmp("readreg", comando, 7) == 0)
+        {
+            int cedula;
+            fscanf(stdin, "%d", &cedula);
+            readreg(espaciobd,tamanobd,cedula);
+        }
         else if (strncmp("exit", comando, 4) == 0)
         {
+            int opcion;
+            printf("Desea guardar la base de datos?\n1 si desea guardarla.\n2 si no desea guardarla.\n");
+            scanf("%d", &opcion);
+            getc(stdin);
+            if (opcion == 1)
+            {
+                char nombre[20];
+                printf("Ingrese el nombre de la db\n");
+                scanf("%s", nombre);
+                getc(stdin);
+                FILE *archivo2 = fopen(nombre, "w+");
+                savedb(archivo2, espaciobd, nombre, tamanobd, contadorRegistro);
+                fclose(archivo2);
+            }
             break;
         }
 
     } while (1);
-
+    free(espaciobd);
     return 0;
 }
