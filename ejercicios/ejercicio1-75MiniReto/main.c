@@ -4,9 +4,6 @@
 #include "gun.h"
 #include "player.h"
 
-//END ARMA
-//PLAYER
-
 int main(int argc, char const *argv[])
 {
     struct gun *Arma = crearArma();
