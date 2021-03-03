@@ -155,13 +155,13 @@ void infoActive(struct database *espaciobases,int contdatabase,int contRegistros
     printf("Base de datos activa: %s\n",(espaciobases+(contdatabase-1))->nombrebd);
     printf("Registros disponibles: %d\n",((espaciobases+(contdatabase-1))->nroRegistros)-contRegistros);
 }
-cantRegActive(struct database *espaciobases,int contdatabase);
-cantRegActive(struct database *espaciobases,int contdatabase)
+void cantRegActive(struct database *espaciobases,int contdatabase);
+void cantRegActive(struct database *espaciobases,int contdatabase)
 {
     printf("Cantidad de registros que puede almacenar %s: %d\n",(espaciobases+(contdatabase-1))->nombrebd,(espaciobases+(contdatabase-1))->nroRegistros);
 }
-readreg(struct database *espaciobases,struct estudiante *Registros,int contdatabase,int cedula);
-readreg(struct database *espaciobases,struct estudiante *Registros,int contdatabase,int cedula)
+void readreg(struct database *espaciobases,struct estudiante *Registros,int contdatabase,int cedula);
+void readreg(struct database *espaciobases,struct estudiante *Registros,int contdatabase,int cedula)
 {
     int found = 0;
     for (int i = 0; i < (espaciobases+(contdatabase-1))->nroRegistros; i++)
