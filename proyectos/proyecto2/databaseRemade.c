@@ -223,6 +223,7 @@ int main(int argc, char const *argv[])
             // fgets("nan", "%s[^\n]", stdin); //Eliminar argumentos extras.
             FILE *archivo2 = fopen((espaciobases+(contdatabase-1))->nombrebd, "w+");
             savedb(archivo2,bdAct,((espaciobases+(contdatabase-1))->nombrebd),((espaciobases+(contdatabase-1))->nroRegistros),contRegistros);
+            fclose(archivo2);
         }
         else if (strncmp("ldb", comando, 3) == 0)
         {
@@ -285,7 +286,8 @@ int main(int argc, char const *argv[])
             }
             break;
         }
-
     } while (1);
+    free(bdAct);
+    free(espaciobases);
     return 0;
 }

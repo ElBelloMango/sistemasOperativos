@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 int main(int argc, char *argv[])
 {
@@ -8,6 +10,7 @@ int main(int argc, char *argv[])
 
     printf("Este proceso va a crear otro proceso\n\n");
     printf("El pid del programa padre es: %d\n", (int)getpid());
+    wait(0);
     pid_hijo = fork();
     switch (pid_hijo)
     {
