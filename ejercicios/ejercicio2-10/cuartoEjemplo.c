@@ -21,9 +21,9 @@ int main(void)
     for (i = 0; i < 4; ++i) 
     {
         pthread_create(&hilos_ids[i],NULL,(void *)ft,NULL);
-        pthread_join(hilos_ids[i],NULL);
+        // pthread_join(hilos_ids[i],NULL);
     }
-    //for (i = 0; i < 4; ++i) pthread_join(hilos_ids[i],NULL);
+    for (i = 0; i < 4; ++i) pthread_join(hilos_ids[i],NULL);
     printf("Hilo principal: x = %d\n",x);
     return 0;
 }
