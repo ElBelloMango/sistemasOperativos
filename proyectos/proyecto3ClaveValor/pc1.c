@@ -52,12 +52,6 @@ int main(int argc, char const *argv[])
         printf("%s\t%d\t\n", (espacio + i)->clave,(espacio + i)->valor);
     }
     bubbleSort(espacio,contRegistros);
-    printf("Luego del sort\n");
-    printf("|clave |valor |\n");
-    for (int i = 0; i < contRegistros; i++)
-    {
-        printf("%s\t%d\t\n", (espacio + i)->clave,(espacio + i)->valor);
-    }
     for (int i = 0; i < contRegistros; i++)
     {
         fprintf(archivo2, "%s %d\n", (espacio + i)->clave, (espacio + i)->valor);

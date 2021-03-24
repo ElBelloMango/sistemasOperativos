@@ -37,12 +37,6 @@ int main(int argc, char const *argv[])
     {
         printf("%s\t%d\t\n", (espacio + i)->clave,(espacio + i)->valor);
     }
-    printf("Orden inverso\n");
-    printf("|clave |valor |\n");
-    for (int i = contRegistros-1; i >= 0; i--)
-    {
-        printf("%s\t%d\t\n", (espacio + i)->clave,(espacio + i)->valor);
-    }
     for (int i = contRegistros-1; i >= 0; i--)
     {
         fprintf(archivo2, "%s %d\n", (espacio + i)->clave, (espacio + i)->valor);
