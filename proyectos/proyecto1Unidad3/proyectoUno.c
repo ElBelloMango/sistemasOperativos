@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define BUF_SIZE 20
+#define BUF_SIZE 100
 
 int main(int argc, char *argv[])
 {
