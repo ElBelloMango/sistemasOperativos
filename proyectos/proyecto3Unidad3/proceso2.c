@@ -25,7 +25,7 @@ struct parametros
 
 void init_control_mechanism()
 {
-    // Primer Proceso
+
     sem2write = sem_open("sem2write", O_CREAT, 0666, 0);
     if (sem2write == SEM_FAILED)
     {
@@ -40,7 +40,6 @@ void init_control_mechanism()
         exit(EXIT_FAILURE);
     }
 
-    //Segundo proceso
     sem1write = sem_open("sem1write", 0);
     if (sem1write == SEM_FAILED)
     {
@@ -170,7 +169,6 @@ void *reciveMsg(void *parametros)
             exit(EXIT_FAILURE);
         }
 
-        //abrir candado semaforo lectura 1
         if (sem_post(sem2read) == -1)
         {
             perror("sem_post error sem2read: ");
@@ -185,8 +183,7 @@ int main(int argc, char **argv)
     pthread_t hilos_ids[2];
     init_shared_resource();
     init_control_mechanism();
-
-    // Truncate fd1
+    
     if (ftruncate(shared_fd1, SH_SIZE * sizeof(char)) < 0)
     {
         perror("Truncation failed: ");

@@ -25,7 +25,6 @@ struct parametros
 
 void init_control_mechanism()
 {
-    // Primer Proceso
     sem1write = sem_open("sem1write", O_CREAT, 0666, 0);
     if(sem1write == SEM_FAILED){
         perror("user 1 sem_open sem1w fails: ");
@@ -154,7 +153,6 @@ void *reciveMsg(void *parametros)
             exit(EXIT_FAILURE);
         }
 
-        //abrir candado semaforo lectura 1
         if(sem_post(sem1read) == -1){
             perror("sem_post error sem1r: ");
             exit(EXIT_FAILURE);
@@ -170,7 +168,6 @@ int main(int argc, char **argv)
     init_shared_resource();
     init_control_mechanism();
 
-    // Truncate fd1
     if (ftruncate(shared_fd1, SH_SIZE * sizeof(char)) < 0)
     {
         perror("Truncation failed: ");
