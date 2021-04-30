@@ -90,7 +90,7 @@ int main(void)
    }
    printf("Listo para la comunicación.\n");
    printf("Enter lines of text, ^D to quit:\n");
-   buf.mtype = 1; /* we don't really care in this case */
+   buf.mtype = 1; /* we do really care in this case */
 
    struct parametros hilo1_param;
    struct parametros hilo2_param;
