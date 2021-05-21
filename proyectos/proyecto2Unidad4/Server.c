@@ -153,8 +153,10 @@ int main(int argc, char *argv[])
     {
         for (int i = 0; i < 10; i++)
         {
+            printf("Inició en: %d, %d\n",i,posAva[i]);
             if (posAva[i] == 0)
             {   
+                printf("Disponible en: %d, %d\n",i,posAva[i]);
                 posAva[i] = 1;
                 printf("Waiting for a client\n");
                 client_sd[i] = accept(server_sd, NULL, NULL);
@@ -179,6 +181,7 @@ int main(int argc, char *argv[])
                     exit(EXIT_FAILURE);
                 }
                 clientnum++;
+                i=-1;
             }
         }   
     }
