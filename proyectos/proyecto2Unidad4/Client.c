@@ -29,6 +29,7 @@ void *readThread(void *arg)
     while (1)
     {
         numOfBytes = read(client->socket, buf, BUF_SIZE);
+        // printf("Usuario recibió: %s\n",buf);
         if (0 == numOfBytes)
         {
             printf("Server closed the socket end\n");
@@ -41,8 +42,8 @@ void *readThread(void *arg)
         }
         else
         {
-            write(STDOUT_FILENO,buf,BUF_SIZE);
-            // printf("Usuario dijo: %s\n",buf);
+            write(STDOUT_FILENO,buf,strlen(buf));
+            
         }
     }
     printf("Terminate Pthread for reading\n");
@@ -81,7 +82,7 @@ void *writeThread(void *arg)
 
   
         status = write(client->socket, buf, strlen(buf) + 1);
-        
+        // printf("Pruebas de errores.\nBuf: %s\n",buf);
         if (primera==0)
         {
             printf("Conectado, ya puede chatear\n");

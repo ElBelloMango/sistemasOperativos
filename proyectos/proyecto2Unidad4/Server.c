@@ -11,6 +11,7 @@
 #define PORT 6666
 #define BUF_SIZE 128
 int clientnum = 0;
+int posAva[10];
 
 struct client_t
 {
@@ -30,6 +31,7 @@ void *readThread(void *arg)
     int status;
     while (1)
     {
+        strcpy(buf,"");
         numOfBytes = read(clientEnd->socket, buf, BUF_SIZE);
         if (0 == numOfBytes)
         {
@@ -51,28 +53,31 @@ void *readThread(void *arg)
             }
             else
             {
-                printf("from client %s, #: %d: %s\n", clientEnd->nombreCliente,clientEnd->nroCliente, buf);
+                printf("from client %s, #: %d: %s\n", clientEnd->nombreCliente, clientEnd->nroCliente, buf);
                 char msg[BUF_SIZE];
-                strcat(msg,clientEnd->nombreCliente);
-                strcat(msg,": ");
-                strcat(msg,buf);
-                strcat(msg,"\n");
-                strcpy(buf,msg);
+                strcat(msg, clientEnd->nombreCliente);
+                strcat(msg, ": ");
+                strcat(msg, buf);
+                strcat(msg, "\n");
+                strcpy(buf, msg);
+                strcpy(msg,"");
                 for (int i = 0; i < clientnum; i++)
                 {
                     if (i != clientEnd->nroCliente)
                     {
                         status = write(client[i].socket, buf, strlen(buf) + 1);
+                        // printf("Pruebas de errores. Usuario: %s\nBuf: %s\nMsg: %s",clientEnd->nombreCliente,buf,msg);
                     }
                 }
             }
         }
     }
     printf("Terminate Pthread for reading\n");
-    client->rxState = 0;
+    clientEnd->rxState = 0;
     if (0 == client[clientEnd->nroCliente].rxState)
     {
-        printf("Client closed the socket\n");
+        posAva[clientEnd->nroCliente] = 0;
+        printf("Client #: %d closed the socket\n",clientEnd->nroCliente);
         close(client[clientEnd->nroCliente].socket);
         clientnum--;
     }
@@ -138,33 +143,44 @@ int main(int argc, char *argv[])
 
     printf("Server listening\n");
 
+
+    for (int i = 0; i < 10; i++)
+    {
+        posAva[i]=0;
+    }
+    
     while (1)
     {
-        // 6. Accept:
-        printf("Waiting for a client\n");
-        client_sd[clientnum] = accept(server_sd, NULL, NULL);
-        printf("Client connected\n");
-        if (-1 == client_sd[clientnum])
+        for (int i = 0; i < 10; i++)
         {
-            perror("Accept fails: ");
-            close(server_sd);
-            exit(EXIT_FAILURE);
-        }
-        // 7. Create a thread for receiving messages from client
-        client[clientnum].socket = client_sd[clientnum];
-        client[clientnum].rxState = 1;
-        client[clientnum].nroCliente = clientnum;
+            if (posAva[i] == 0)
+            {   
+                posAva[i] = 1;
+                printf("Waiting for a client\n");
+                client_sd[i] = accept(server_sd, NULL, NULL);
+                printf("Client connected\n");
+                if (-1 == client_sd[i])
+                {
+                    perror("Accept fails: ");
+                    close(server_sd);
+                    exit(EXIT_FAILURE);
+                }
+                // 7. Create a thread for receiving messages from client
+                client[i].socket = client_sd[i];
+                client[i].rxState = 1;
+                client[i].nroCliente = i;
 
-        printf("Create Pthread for reading\n");
-        status = pthread_create(&rxThreadId[clientnum], NULL, &readThread, &client[clientnum]);
-        if (-1 == status)
-        {
-            perror("Pthread read fails: ");
-            close(server_sd);
-            exit(EXIT_FAILURE);
-        }
-        clientnum++;
+                printf("Create Pthread for reading\n");
+                status = pthread_create(&rxThreadId[i], NULL, &readThread, &client[i]);
+                if (-1 == status)
+                {
+                    perror("Pthread read fails: ");
+                    close(server_sd);
+                    exit(EXIT_FAILURE);
+                }
+                clientnum++;
+            }
+        }   
     }
-
     exit(EXIT_SUCCESS);
 }
