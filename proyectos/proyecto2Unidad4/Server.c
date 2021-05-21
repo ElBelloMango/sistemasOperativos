@@ -31,7 +31,7 @@ void *readThread(void *arg)
     int status;
     while (1)
     {
-        strcpy(buf,"");
+        strcpy(buf, "");
         numOfBytes = read(clientEnd->socket, buf, BUF_SIZE);
         if (0 == numOfBytes)
         {
@@ -53,14 +53,14 @@ void *readThread(void *arg)
             }
             else
             {
-                printf("from client %s, #: %d: %s\n", clientEnd->nombreCliente, clientEnd->nroCliente, buf);
+                printf("from client %s: %s\n", clientEnd->nombreCliente, buf);
                 char msg[BUF_SIZE];
                 strcat(msg, clientEnd->nombreCliente);
                 strcat(msg, ": ");
                 strcat(msg, buf);
                 strcat(msg, "\n");
                 strcpy(buf, msg);
-                strcpy(msg,"");
+                strcpy(msg, "");
                 for (int i = 0; i < clientnum; i++)
                 {
                     if (i != clientEnd->nroCliente)
@@ -73,15 +73,57 @@ void *readThread(void *arg)
         }
     }
     printf("Terminate Pthread for reading\n");
-    clientEnd->rxState = 0;
+    client[clientEnd->nroCliente].rxState = 0;
     if (0 == client[clientEnd->nroCliente].rxState)
     {
         posAva[clientEnd->nroCliente] = 0;
-        printf("Client #: %d closed the socket\n",clientEnd->nroCliente);
+        printf("Client #: %d closed the socket\n", clientEnd->nroCliente);
         close(client[clientEnd->nroCliente].socket);
         clientnum--;
     }
     return NULL;
+}
+
+void *commandsThread(void *arg)
+{
+    int opcion;
+    do
+    {
+        printf("Ingrese:\n1 para ver los usuarios conectados\n2 para desconectar un usuario\n");
+        scanf("%d", &opcion);
+        if (opcion == 1)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                if (client[i].rxState == 1)
+                {
+                    printf("#:%d User:%s\n", client[i].nroCliente, client[i].nombreCliente);
+                }
+            }
+        }
+        else if (opcion == 2)
+        {
+            int user;
+            printf("Clientes conectados:\n");
+            for (int i = 0; i < 10; i++)
+            {
+                if (client[i].rxState == 1)
+                { 
+                    printf("#:%d User:%s\n", client[i].nroCliente, client[i].nombreCliente);
+                }
+            }
+            printf("Ingrese el numero del usuario que desea desconectar:\n");
+            scanf("%d", &user);
+            if (client[user].rxState == 1)
+            {
+                printf("Usuario #:%d , %s ha sido desconectado\n", client[user].nroCliente, client[user].nombreCliente);
+                write(client[user].socket, ":exit", strlen(":exit"));
+                client[user].rxState=0;
+                posAva[user] = 0;
+                close(client[user].socket);
+            }
+        }
+    } while (opcion != 0);
 }
 
 int main(int argc, char *argv[])
@@ -93,6 +135,7 @@ int main(int argc, char *argv[])
     int server_sd;
     int client_sd[10];
     pthread_t rxThreadId[10];
+    pthread_t comandos;
 
     // 1. Ignore SIGPIPE
     signal(SIGPIPE, SIG_IGN);
@@ -143,20 +186,18 @@ int main(int argc, char *argv[])
 
     printf("Server listening\n");
 
-
+    pthread_create(&comandos, NULL, &commandsThread, NULL);
     for (int i = 0; i < 10; i++)
     {
-        posAva[i]=0;
+        posAva[i] = 0;
     }
-    
+
     while (1)
     {
         for (int i = 0; i < 10; i++)
         {
-            printf("Inició en: %d, %d\n",i,posAva[i]);
             if (posAva[i] == 0)
-            {   
-                printf("Disponible en: %d, %d\n",i,posAva[i]);
+            {
                 posAva[i] = 1;
                 printf("Waiting for a client\n");
                 client_sd[i] = accept(server_sd, NULL, NULL);
@@ -181,9 +222,9 @@ int main(int argc, char *argv[])
                     exit(EXIT_FAILURE);
                 }
                 clientnum++;
-                i=-1;
+                i = -1;
             }
-        }   
+        }
     }
     exit(EXIT_SUCCESS);
 }

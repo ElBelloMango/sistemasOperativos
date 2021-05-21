@@ -40,6 +40,13 @@ void *readThread(void *arg)
             perror("ReadThread read() fails: ");
             break;
         }
+        if (0 == strncmp(buf, ":exit", strlen(":exit")))
+        {
+            printf("Disconnected from server\n");
+            close(client->socket);
+            exit(EXIT_SUCCESS);
+            break;
+        }
         else
         {
             write(STDOUT_FILENO,buf,strlen(buf));
